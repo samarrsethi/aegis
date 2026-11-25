@@ -6,10 +6,10 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { CinematicMusicEngine } from '@/lib/audio/CinematicMusicEngine';
 import {
-  HolographicSuit3D,
-  createInitialHologramState,
-  type HologramDirectorState,
-} from './HolographicSuit3D';
+  PlanetaryAwakeningScene,
+  createInitialPlanetState,
+  type PlanetDirectorState,
+} from './PlanetaryAwakeningScene';
 
 class IntroWebGLErrorBoundary extends Component<
   { children: React.ReactNode; onError: () => void },
@@ -42,9 +42,10 @@ export function CinematicIntro() {
   const [awaitingGate, setAwaitingGate] = useState<boolean>(
     settings.startupSoundEnabled
   );
+  const [flashOpacity, setFlashOpacity] = useState(0);
   const [overlayOpacity, setOverlayOpacity] = useState(1);
 
-  const directorRef = useRef<HologramDirectorState>(createInitialHologramState());
+  const directorRef = useRef<PlanetDirectorState>(createInitialPlanetState());
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const musicRef = useRef<CinematicMusicEngine | null>(null);
   const startedRef = useRef(false);
@@ -115,12 +116,16 @@ export function CinematicIntro() {
       }
 
       const d = directorRef.current;
+      const flashProxy = { val: 0 };
       const overlayProxy = { val: 1 };
 
       const tl = gsap.timeline({
         onUpdate: () => {
-          // Map progress smoothly (capped below 0.71 to keep score purely melodic/ambient without blast hit)
-          music.setProgress(Math.min(0.68, tl.progress() * 0.85));
+          // Synchronize music curve so climax hits at Scene 3 explosion (~5.0-7.0s)
+          // and resolves softly at Scene 5 (~9.0-11.0s)
+          const p = tl.progress();
+          const musicPos = p < 0.45 ? p * 1.45 : p < 0.65 ? 0.65 + (p - 0.45) * 0.6 : 0.77 + (p - 0.65) * 0.65;
+          music.setProgress(Math.min(1, musicPos));
         },
         onComplete: () => {
           cleanupAll();
@@ -129,100 +134,96 @@ export function CinematicIntro() {
       });
       timelineRef.current = tl;
 
-      // ─── SCENE 1: INITIALIZATION (0.0s – 1.4s) ───
-      // Black screen -> small cyan particles -> thin luminous lines emerge
+      // ─── SCENE 1: PLANET APPEARS (0.0s – 3.0s) ───
       tl.to(
         d,
         {
-          gridOpacity: 0.75,
-          initLinesProgress: 1,
-          duration: 1.4,
-          ease: 'power1.inOut',
+          planetOpacity: 1,
+          cameraZ: 6.1,
+          duration: 3.0,
+          ease: 'power2.out',
         },
         0
       );
 
-      // ─── SCENE 2: HOLOGRAM CONSTRUCTION (1.4s – 4.4s) ───
-      // Progressive path-tracing: helmet -> eyes -> neck/shoulders -> chest/reactor -> arms -> torso/legs
+      // ─── SCENE 2: PLANETARY ENERGY (3.0s – 5.0s) ───
       tl.to(
         d,
         {
-          drawProgress: 1,
-          scanY: 2.2,
-          duration: 3.0,
-          ease: 'power1.inOut',
-        },
-        1.4
-      );
-      tl.to(d, { eyesGlow: 1, duration: 0.45, ease: 'power2.out' }, 1.85);
-
-      // ─── SCENE 3: REACTOR ACTIVATION (4.4s – 6.4s) ───
-      // Smooth camera push toward chest, rotating concentric rings, energy pulse through lines
-      tl.to(
-        d,
-        {
-          cameraZ: 3.0,
-          cameraY: 1.36,
-          cameraLookY: 1.36,
-          reactorSpin: 2.0,
-          reactorGlow: 1.0,
-          duration: 1.5,
+          rotationSpeed: 0.04,
+          fractureProgress: 1,
+          energyPulse: 2.0,
+          cameraZ: 5.4,
+          duration: 2.0,
           ease: 'power2.inOut',
         },
-        4.4
-      );
-      tl.to(
-        d,
-        {
-          energyWave: 1.35,
-          duration: 1.4,
-          ease: 'power1.inOut',
-        },
-        4.8
+        3.0
       );
 
-      // ─── SCENE 4: HOLOGRAPHIC DISINTEGRATION (6.4s – 8.0s) ───
-      // Dissolve into thousands of glowing lines & particles -> converge toward center
+      // ─── SCENE 3: PLANET EXPLOSION (5.0s – 7.0s) ───
       tl.to(
         d,
         {
-          disintegrate: 1,
-          gridOpacity: 0,
-          cameraZ: 5.2,
-          cameraY: 1.15,
-          cameraLookY: 1.15,
-          duration: 0.9,
+          explodeProgress: 1,
+          shockwaveProgress: 1,
+          cameraShake: 1,
+          duration: 1.85,
+          ease: 'power3.out',
+        },
+        5.0
+      );
+      tl.to(
+        flashProxy,
+        {
+          val: 0.72,
+          duration: 0.25,
+          ease: 'power2.in',
+          onUpdate: () => setFlashOpacity(flashProxy.val),
+        },
+        5.05
+      );
+      tl.to(
+        flashProxy,
+        {
+          val: 0,
+          duration: 0.75,
           ease: 'power2.out',
+          onUpdate: () => setFlashOpacity(flashProxy.val),
         },
-        6.4
+        5.35
       );
+
+      // ─── SCENE 4: PARTICLE RECONSTRUCTION (7.0s – 9.0s) ───
       tl.to(
         d,
         {
-          collapseToOrb: 1,
-          duration: 0.9,
+          cameraShake: 0,
+          reconstructProgress: 1,
+          orbCoreOpacity: 1,
+          cameraZ: 5.2,
+          cameraY: 0,
+          duration: 2.0,
           ease: 'power2.inOut',
         },
-        7.1
+        7.0
       );
 
-      // ─── SCENE 5: A.E.G.I.S. REVEAL (8.0s – 9.0s) ───
-      // Smooth cross-fade into the chatbot around the AI orb
+      // ─── SCENE 5: CHATBOT REVEAL (9.0s – 11.0s) ───
       tl.to(
         overlayProxy,
         {
           val: 0,
-          duration: 0.95,
+          duration: 1.6,
           ease: 'power2.inOut',
           onUpdate: () => setOverlayOpacity(overlayProxy.val),
         },
-        8.05
+        9.4
       );
     },
     [cleanupAll, setIntroComplete, settings.reducedMotion]
   );
 
-  // Automatic playback on mount (or autoplay gate if browser blocks AudioContext)
+  // Automatic playback (or autoplay gate if browser blocks AudioContext)
   useEffect(() => {
     if (settings.reducedMotion) return;
 
@@ -262,12 +263,12 @@ export function CinematicIntro() {
     <div
       className="fixed inset-0 z-50 bg-aegis-obsidian select-none"
       style={{ opacity: overlayOpacity }}
-      aria-label="A.E.G.I.S. Holographic Initialization"
+      aria-label="A.E.G.I.S. Planetary Awakening"
     >
-      {/* Pure Holographic Line & Particle Stage */}
+      {/* 3D Planetary Awakening Stage (with WebGL fallback) */}
       {!webglFailed ? (
         <IntroWebGLErrorBoundary onError={() => setWebglFailed(true)}>
-          <HolographicSuit3D
+          <PlanetaryAwakeningScene
             directorRef={directorRef}
             isMobile={isMobile}
             onWebGLError={() => setWebglFailed(true)}
@@ -279,14 +280,19 @@ export function CinematicIntro() {
         </div>
       )}
 
-      {/* Minimal Technical Corner Label */}
-      {!awaitingGate && (
-        <div className="pointer-events-none fixed bottom-6 left-6 z-30 font-mono text-[10px] uppercase tracking-[0.25em] text-aegis-cyan/70">
-          INITIALIZING A.E.G.I.S. CORE
-        </div>
+      {/* Controlled Cyan Flash on Planet Explosion */}
+      {flashOpacity > 0.005 && (
+        <div
+          className="pointer-events-none fixed inset-0 z-20"
+          style={{
+            opacity: flashOpacity,
+            background:
+              'radial-gradient(circle at center, #EDF5F7 0%, #53D9E8 42%, #050709 100%)',
+          }}
+        />
       )}
 
-      {/* Autoplay-Respecting Sound Gate */}
+      {/* Autoplay-Respecting Music Gate */}
       {awaitingGate && (
         <div className="fixed inset-0 z-30 flex flex-col items-center justify-center bg-aegis-obsidian/95 px-6 text-center backdrop-blur-sm">
           <div className="mb-2 h-2 w-2 rounded-full bg-aegis-cyan animate-pulse" />
@@ -294,7 +300,7 @@ export function CinematicIntro() {
             A.E.G.I.S.
           </h2>
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-aegis-text-secondary">
-            Holographic Core Initialization
+            Adaptive Engine for General Intelligence Systems
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <button
@@ -306,7 +312,7 @@ export function CinematicIntro() {
               className="inline-flex items-center gap-2 rounded-lg border border-aegis-cyan/50 bg-aegis-cyan/15 px-5 py-2.5 font-mono text-xs uppercase tracking-widest text-aegis-cyan transition-colors hover:bg-aegis-cyan/25"
             >
               <Volume2 className="h-4 w-4" />
-              <span>Launch with Sound</span>
+              <span>Enter with Music</span>
             </button>
             <button
               type="button"
