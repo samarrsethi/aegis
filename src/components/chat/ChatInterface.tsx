@@ -657,7 +657,7 @@ export function ChatInterface() {
                 }}
                 className="relative mb-4 flex items-center justify-center"
               >
-                <AIOrb size="medium" />
+                <AIOrb size={isMobile ? 'medium' : 'large'} />
               </motion.div>
 
               <motion.div
@@ -747,7 +747,6 @@ export function ChatInterface() {
                 </button>
               </div>
             )}
-            <TokenUsageMonitor />
             <ChatInput
               onSend={handleSendMessage}
               onMicClick={handleMicClick}
@@ -799,9 +798,11 @@ export function ChatInterface() {
                 Active Model
               </div>
               <div className="mt-1 text-aegis-ice">
-                {settings.model || systemStatus.model}
+                {systemStatus.model || settings.model}
               </div>
             </div>
+
+            <TokenUsageMonitor />
 
             <div className="rounded-lg bg-aegis-obsidian/60 p-2.5 aegis-border">
               <div className="text-[10px] uppercase tracking-wider text-aegis-text-secondary">
