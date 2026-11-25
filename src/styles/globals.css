@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --aegis-obsidian: #050709;
+  --aegis-graphite: #111820;
+  --aegis-titanium: #202A32;
+  --aegis-cyan: #53D9E8;
+  --aegis-ice: #A8EAF0;
+  --aegis-amber: #D6A45C;
+  --aegis-text: #EDF5F7;
+  --aegis-text-secondary: #8296A1;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--aegis-obsidian);
+  color: var(--aegis-text);
+  font-family: 'Inter', sans-serif;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--aegis-titanium);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--aegis-text-secondary);
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: rgba(83, 217, 232, 0.25);
+  color: var(--aegis-text);
+}
+
+/* ─── Global Utilities ─── */
+.aegis-glow {
+  box-shadow: 0 0 20px rgba(83, 217, 232, 0.15), 0 0 40px rgba(83, 217, 232, 0.05);
+}
+
+.aegis-glow-text {
+  text-shadow: 0 0 10px rgba(83, 217, 232, 0.5), 0 0 20px rgba(83, 217, 232, 0.2);
+}
+
+.aegis-border {
+  border: 1px solid rgba(83, 217, 232, 0.12);
+}
+
+.aegis-grid-bg {
+  background-image:
+    linear-gradient(rgba(83, 217, 232, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(83, 217, 232, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── Code Blocks ─── */
+pre {
+  background: var(--aegis-graphite) !important;
+  border: 1px solid rgba(83, 217, 232, 0.08);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+}
+
+/* ─── Focus styles ─── */
+*:focus-visible {
+  outline: 1px solid var(--aegis-cyan);
+  outline-offset: 2px;
+}
+
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Canvas ─── */
+canvas {
+  display: block;
+}
+
+/* ─── Markdown Styles ─── */
+.aegis-markdown h1,
+.aegis-markdown h2,
+.aegis-markdown h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--aegis-text);
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.aegis-markdown h1 { font-size: 1.5rem; font-weight: 600; }
+.aegis-markdown h2 { font-size: 1.25rem; font-weight: 600; }
+.aegis-markdown h3 { font-size: 1.1rem; font-weight: 500; }
+
+.aegis-markdown p {
+  margin-bottom: 0.75em;
+  line-height: 1.7;
+}
+
+.aegis-markdown ul, .aegis-markdown ol {
+  padding-left: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.aegis-markdown li {
+  margin-bottom: 0.25em;
+  line-height: 1.6;
+}
+
+.aegis-markdown blockquote {
+  border-left: 2px solid var(--aegis-cyan);
+  padding-left: 1em;
+  margin: 0.75em 0;
+  color: var(--aegis-text-secondary);
+}
+
+.aegis-markdown a {
+  color: var(--aegis-cyan);
+  text-decoration: none;
+}
+
+.aegis-markdown a:hover {
+  text-decoration: underline;
+}
+
+.aegis-markdown code:not(pre code) {
+  background: rgba(83, 217, 232, 0.08);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.875em;
+  color: var(--aegis-ice);
+}
+
+.aegis-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+}
+
+.aegis-markdown th,
+.aegis-markdown td {
+  padding: 0.5em 0.75em;
+  border: 1px solid rgba(83, 217, 232, 0.1);
+  text-align: left;
+}
+
+.aegis-markdown th {
+  background: rgba(83, 217, 232, 0.05);
+  font-weight: 500;
+}
+
+.aegis-markdown hr {
+  border: none;
+  border-top: 1px solid rgba(83, 217, 232, 0.1);
+  margin: 1.5em 0;
+}
